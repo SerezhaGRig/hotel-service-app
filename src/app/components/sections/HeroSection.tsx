@@ -40,10 +40,12 @@ export const HeroSection: React.FC = () => {
                                 <span>4.8/5 Rating</span>
                             </div>
                         </div>
-                        <Button onClick={scrollToRooms} variant="secondary" size="lg">
-                            Explore Our Rooms
-                            <ArrowDown className="ml-2 animate-bounce" size={20}/>
-                        </Button>
+                        <div className="flex justify-center">
+                            <Button onClick={scrollToRooms} variant="secondary" size="lg">
+                                Explore Our Rooms
+                                <ArrowDown className="ml-2 animate-bounce" size={20}/>
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </div>
