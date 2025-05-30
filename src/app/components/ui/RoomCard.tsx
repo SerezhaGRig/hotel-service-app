@@ -1,9 +1,10 @@
 "use client"
 
 import React, { useState } from 'react';
-import { Users, MapPin, ChevronRight } from 'lucide-react';
+import { Users, MapPin, ChevronRight, Eye } from 'lucide-react';
 import { Room } from '@/app/types/hotel.types';
 import { Button } from './Button';
+import { useRouter } from 'next/navigation';
 
 interface RoomCardProps {
     room: Room;
@@ -13,12 +14,19 @@ interface RoomCardProps {
 
 export const RoomCard: React.FC<RoomCardProps> = ({ room, onBook, index }) => {
     const [isHovered, setIsHovered] = useState(false);
+    const router = useRouter();
+
+    const handleViewDetails = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        router.push(`/rooms/${room.id}`);
+    };
 
     return (
         <div
-            className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-500"
+            className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-500 cursor-pointer"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            onClick={handleViewDetails}
             style={{
                 animationDelay: `${index * 100}ms`
             }}
@@ -31,8 +39,9 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, onBook, index }) => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 {isHovered && (
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
-                        <span className="text-sm font-semibold text-gray-900">Quick View</span>
+                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center">
+                        <Eye size={16} className="mr-1" />
+                        <span className="text-sm font-semibold text-gray-900">View Details</span>
                     </div>
                 )}
             </div>
@@ -67,7 +76,13 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, onBook, index }) => {
                     ))}
                 </div>
 
-                <Button onClick={() => onBook(room)} fullWidth>
+                <Button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onBook(room);
+                    }}
+                    fullWidth
+                >
                     Book Now
                     <ChevronRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>

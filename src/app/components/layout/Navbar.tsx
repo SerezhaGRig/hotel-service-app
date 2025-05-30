@@ -10,10 +10,10 @@ export const Navbar: React.FC = () => {
     const scrolled = useScroll();
 
     const navLinks = [
-        { href: '#', label: 'Home' },
-        { href: '#rooms', label: 'Rooms' },
-        { href: '#amenities', label: 'Amenities' },
-        { href: '#contact', label: 'Contact' }
+        { href: '/', label: 'Home' },
+        { href: '/rooms', label: 'All Rooms' },
+        { href: '/#amenities', label: 'Amenities' },
+        { href: '/#contact', label: 'Contact' }
     ];
 
     return (

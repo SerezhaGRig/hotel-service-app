@@ -1,9 +1,9 @@
 "use client"
 
 import React from 'react';
-import { Check } from 'lucide-react';
-import { Room, BookingForm } from '@/app/types/hotel.types';
-import { Button } from '@/app/components/ui/Button';
+import {Check} from 'lucide-react';
+import {Room, BookingForm} from '@/app/types/hotel.types';
+import {Button} from '@/app/components/ui/Button';
 
 interface BookingModalProps {
     selectedRoom: Room;
@@ -31,7 +31,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     const totalPrice = selectedRoom.price * nights;
 
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+        <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
             <div className="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl transform animate-scale-in">
                 <h3 className="text-2xl font-bold mb-4 text-gray-900">Confirm Your Booking</h3>
 
@@ -63,7 +64,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                     <div className="border-t pt-4">
                         <div className="flex justify-between items-center">
                             <span className="text-lg font-semibold text-gray-900">Total:</span>
-                            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            <span
+                                className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 ${totalPrice}
               </span>
                         </div>
@@ -75,7 +77,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                         Cancel
                     </Button>
                     <Button onClick={onConfirm} fullWidth>
-                        <Check size={20} className="mr-2" />
+                        <Check size={20} className="mr-2"/>
                         Confirm Booking
                     </Button>
                 </div>
