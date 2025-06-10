@@ -2,10 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import { AlertCircle, Save, RefreshCw, LogIn, LogOut } from 'lucide-react';
 
-// TypeScript interfaces based on Swagger documentation
+// TypeScript interfaces with multi-currency support
+interface CurrencyPrices {
+    usd: number;
+    rub: number;
+    amd: number;
+}
+
 interface RoomData {
     id: string;
-    price: number;
+    prices: CurrencyPrices;
 }
 
 interface HotelData {
@@ -27,23 +33,41 @@ const API_BASE_URL = 'https://qbtrm0eq50.execute-api.us-east-1.amazonaws.com/dev
 // Default room types
 const DEFAULT_ROOM_TYPES = ['luxe', 'deluxe', 'econom'];
 
+// Currency configuration
+const CURRENCIES = [
+    { code: 'usd', label: 'USD', symbol: '$' },
+    { code: 'rub', label: 'RUB', symbol: '₽' },
+    { code: 'amd', label: 'AMD', symbol: '֏' }
+] as const;
+
+type CurrencyCode = 'usd' | 'rub' | 'amd';
+
 const HotelAdminPanel: React.FC = () => {
     const [token, setToken] = useState<string>('');
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [login, setLogin] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [selectedPage, setSelectedPage] = useState<string>('main-page');
+    const [selectedPage, setSelectedPage] = useState<string>('landing');
     const [hotelData, setHotelData] = useState<HotelData>({ rooms: [] });
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
     const [success, setSuccess] = useState<string>('');
 
-    // Initialize default room structure
+    // Initialize default room structure with multi-currency support
     const initializeRooms = (data: HotelData | null): HotelData => {
         const rooms = DEFAULT_ROOM_TYPES.map(roomType => {
             const existingRoom = data?.rooms?.find(room => room.id === roomType);
-            return existingRoom || { id: roomType, price: 0 };
+
+            return {
+                id: roomType,
+                prices: {
+                    usd: existingRoom?.prices?.usd || 0,
+                    rub: existingRoom?.prices?.rub || 0,
+                    amd: existingRoom?.prices?.amd || 0
+                }
+            };
         });
+
         return { rooms };
     };
 
@@ -158,10 +182,18 @@ const HotelAdminPanel: React.FC = () => {
         }
     };
 
-    // Update room price
-    const updateRoomPrice = (roomId: string, price: string) => {
+    // Update room price for specific currency
+    const updateRoomPrice = (roomId: string, currency: CurrencyCode, price: string) => {
         const updatedRooms = hotelData.rooms.map(room =>
-            room.id === roomId ? { ...room, price: Number(price) || 0 } : room
+            room.id === roomId
+                ? {
+                    ...room,
+                    prices: {
+                        ...room.prices,
+                        [currency]: Number(price) || 0
+                    }
+                }
+                : room
         );
         setHotelData({ rooms: updatedRooms });
     };
@@ -245,7 +277,7 @@ const HotelAdminPanel: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gray-100 p-4">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-6xl mx-auto">
                 <div className="bg-white rounded-lg shadow-lg p-6">
                     <div className="flex justify-between items-center mb-6">
                         <h1 className="text-2xl font-bold text-gray-800">Hotel Admin Panel</h1>
@@ -307,54 +339,40 @@ const HotelAdminPanel: React.FC = () => {
                                         <th className="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">
                                             Room Type
                                         </th>
-                                        <th className="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">
-                                            Price
-                                        </th>
+                                        {CURRENCIES.map(currency => (
+                                            <th key={currency.code} className="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">
+                                                Price ({currency.label})
+                                            </th>
+                                        ))}
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td className="border border-gray-300 px-4 py-3 font-medium">
-                                            Luxe
-                                        </td>
-                                        <td className="border border-gray-300 px-4 py-3">
-                                            <input
-                                                type="number"
-                                                value={getRoomById('luxe')?.price || 0}
-                                                onChange={(e) => updateRoomPrice('luxe', e.target.value)}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                placeholder="Enter price"
-                                            />
-                                        </td>
-                                    </tr>
-                                    <tr className="bg-gray-50">
-                                        <td className="border border-gray-300 px-4 py-3 font-medium">
-                                            Deluxe
-                                        </td>
-                                        <td className="border border-gray-300 px-4 py-3">
-                                            <input
-                                                type="number"
-                                                value={getRoomById('deluxe')?.price || 0}
-                                                onChange={(e) => updateRoomPrice('deluxe', e.target.value)}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                placeholder="Enter price"
-                                            />
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="border border-gray-300 px-4 py-3 font-medium">
-                                            Econom
-                                        </td>
-                                        <td className="border border-gray-300 px-4 py-3">
-                                            <input
-                                                type="number"
-                                                value={getRoomById('econom')?.price || 0}
-                                                onChange={(e) => updateRoomPrice('econom', e.target.value)}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                placeholder="Enter price"
-                                            />
-                                        </td>
-                                    </tr>
+                                    {DEFAULT_ROOM_TYPES.map((roomType, index) => {
+                                        const room = getRoomById(roomType);
+                                        return (
+                                            <tr key={roomType} className={index % 2 === 1 ? 'bg-gray-50' : ''}>
+                                                <td className="border border-gray-300 px-4 py-3 font-medium capitalize">
+                                                    {roomType}
+                                                </td>
+                                                {CURRENCIES.map(currency => (
+                                                    <td key={currency.code} className="border border-gray-300 px-4 py-3">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-gray-500">{currency.symbol}</span>
+                                                            <input
+                                                                type="number"
+                                                                value={room?.prices[currency.code as CurrencyCode] || 0}
+                                                                onChange={(e) => updateRoomPrice(roomType, currency.code as CurrencyCode, e.target.value)}
+                                                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                                placeholder="Enter price"
+                                                                step="0.01"
+                                                                min="0"
+                                                            />
+                                                        </div>
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                        );
+                                    })}
                                     </tbody>
                                 </table>
                             </div>
